@@ -28,4 +28,14 @@ jobs:
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
           docker push eash1007/swiggy-clone:latest
         env:
-          DOCKER_CLI_ACI: 1
+          DOCKER_CLI_ACI: 1 
+  deploy:
+   needs: build
+   runs-on: [self-hosted]
+   steps:
+      - name: docker pull image
+        run: docker pull eash1007/swiggy-clone:latest
+      - name: Image scan
+        run: trivy image eash1007/swiggy-clone:latest > trivyimagedeploy.txt
+      - name: Deploy to container
+        run: docker run -d --name swiggy-clone -p 3000:3000 eash1007/swiggy-clone:latest  
